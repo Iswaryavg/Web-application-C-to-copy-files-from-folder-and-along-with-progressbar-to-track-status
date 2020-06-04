@@ -1,0 +1,127 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <form >
+
+        <div class="jumbotron">
+
+            <h1 class="display-4">Copy or Move Files.</h1>
+            <div class="form-group">
+                <input type="checkbox" class="form-check-input" id="checkbox2" name="copy" value="true">
+                <label class="form-check-label" for="exampleCheck1" id="ctext">Do you want to Copy files?</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" class="form-check-input" id="checkbox1" name="move" value="true">
+                <label class="form-check-label" for="exampleCheck1" id="ctext1">Do you want to Move files</label>
+            </div>
+            <hr class="my-4">
+           
+            <button onclick="StartProcess()" type="submit" class="btn btn-primary btn-lg">Start the process</button>
+        </div>
+  
+    </form>
+}
+
+<style>
+    .jumbotron
+    {
+        color:dimgrey;
+    }
+</style>
+
+<script>
+    //CALLING METHOD IN THE CONTROLLER TO DO SOME WORK
+    function StartProcess() {
+
+        $.getJSON("/Home/Index",
+            {},
+            function (data) {
+                if (!data) {
+                    alert("Success");
+                    updateStatus()
+                }
+                else {
+                    alert(data);
+                }
+            });
+    }
+    function updateStatus() {
+        debugger;
+        alert('inside Update Status');
+        $.ajax({
+            url: '/Home/LongRunningProcess',
+            type: "GET",
+            cache: false,
+            dataType: "json",
+            success: function (data) {
+                var percentComplete = parseInt(data.PercentComplete);
+                if (percentComplete == null || percentComplete == 100) {
+                    $(".progress").removeClass("active"); // we're done!
+                    $(".progress .bar").css("width", "100%");
+                } else { // update the progress bar
+                    $(".progress").addClass("active");
+                    $(".progress .bar").css("width", percentComplete + "%");
+                    setTimeout(updateStatus, 1000); // call self to refresh
+                }
+            }
+        });
+    }
+
+</script>
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            //set initial state.
+
+
+            $('#checkbox1').change(function () {
+                if ($(this).is(":checked")) {
+
+                    $("#checkbox2").hide();
+
+                    $("#ctext").hide();
+                }
+                else {
+                    $("#checkbox2").show();
+
+                    $("#ctext").show();
+                }
+
+            });
+
+            $('#checkbox2').change(function () {
+                if ($(this).is(":checked")) {
+
+                    $("#checkbox1").hide();
+
+                    $("#ctext1").hide();
+                }
+                else {
+                    $("#checkbox1").show();
+
+                    $("#ctext1").show();
+                }
+            });
+
+        });
+        function start() {
+            debugger;
+            alert('inside start');
+            $.post('/Updateprogressbar/pbar', function (data) {
+                if (data.Exception) {
+                    alert(data.Exception);
+                    return;
+                } else {
+                    alert(data.Result);
+                    updateStatus();
+                    console.log("update");
+                }
+            });
+        }
+   
+    </script>
+}
