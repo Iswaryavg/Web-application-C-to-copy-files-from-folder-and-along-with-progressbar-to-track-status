@@ -3,7 +3,9 @@ Title-Web application showing the progress of copying/moving using HTML5,CSS3,Bo
 **************************************************************************************************************************************
 IDE: Visual Studio 2019 
 OS: Windows
-
+Installation to be done
+Install-Package Microsoft.AspNet.SignalR
+**************************************************************************************************************************************
 Functional Requirements:
 
 Developed a web application on C#, using standard .net components as well as other open source libraries (e.g. jquery)
